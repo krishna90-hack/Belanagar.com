@@ -1,0 +1,26 @@
+fetch('../content/village/bela-nagar.md')
+  .then(res => res.text())
+  .then(md => {
+    const fm = md.match(/---([\s\S]*?)---/)[1];
+    const body = md.replace(/---[\s\S]*?---/, '');
+    const data = {};
+    fm.split('\n').forEach(line => {
+      const [k, ...r] = line.split(':');
+      data[k.trim()] = r.join(':').trim().replace(/"/g, '');
+    });
+    const schemes = data.schemes.split('-').map(s => s.trim()).filter(s => s);
+    document.getElementById('about').innerHTML = `
+      <h2>${data.title}</h2>
+      <p><strong>कुल जनसंख्या:</strong> ${data.population_total}</p>
+      <p><strong>पुरुष:</strong> ${data.population_male} | <strong>महिला:</strong> ${data.population_female}</p>
+      <p><strong>साक्षरता दर:</strong> ${data.literacy_rate}</p>
+      <p><strong>ग्राम प्रधान:</strong> ${data.gram_pradhan}</p>
+      <p><strong>विद्यालय:</strong> ${data.schools} | <strong>अस्पताल:</strong> ${data.hospitals}</p>
+      <p><strong>योजनाएँ:</strong> ${schemes.join(', ')}</p>
+      <hr/>
+      ${body.split('\n').map(l => `<p>${l}</p>`).join('')}
+    `;
+  })
+  .catch(err => {
+    document.getElementById('about').innerHTML = `<p>Content load error: ${err}</p>`;
+  });
